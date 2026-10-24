@@ -9,7 +9,7 @@ const categories = [
     name: "SEWA BOT 1",
     subtitle: "MURAH",
     image: "catagorysewabot1.jpg",
-    description: "Paket sewa bot dengan harga ekonomis.",
+    description: "Paket sewa bot ekonomis.",
     type: "daily",
     monthly: 15000
   },
@@ -18,7 +18,7 @@ const categories = [
     name: "SEWA BOT 2",
     subtitle: "BIASA",
     image: "catagorysewabot2.jpg",
-    description: "Paket sewa bot untuk penggunaan reguler.",
+    description: "Paket sewa bot reguler.",
     type: "daily",
     monthly: 25000
   },
@@ -36,7 +36,7 @@ const categories = [
     name: "USER PREMIUM",
     subtitle: "AKSES PREMIUM",
     image: "catagoryuserpremium.jpg",
-    description: "Akses fitur premium yang tidak tersedia bagi user biasa.",
+    description: "Akses fitur premium yang tidak tersedia untuk user biasa.",
     type: "fixed",
     packages: [
       { label: "1 Bulan", price: 50000 },
@@ -50,7 +50,7 @@ const categories = [
     name: "RESELLER / OWNER",
     subtitle: "AKSES PENUH",
     image: "catagoryresellerowner.jpg",
-    description: "Bisa menjual kembali layanan bot dan memperoleh keuntungan dari penjualan.",
+    description: "Jual kembali layanan bot dan dapatkan keuntungan dari penjualan.",
     type: "fixed",
     packages: [
       { label: "1 Bulan", price: 100000 },
@@ -61,171 +61,139 @@ const categories = [
   }
 ];
 
-const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-const categoryGrid = $("categoryGrid");
-const priceSection = $("harga");
-const checkoutSection = $("checkout");
-const paymentSection = $("payment");
-const priceList = $("priceList");
-const priceTitle = $("priceTitle");
-const priceDescription = $("priceDescription");
-const durationGroup = $("durationGroup");
+const homePage = $("homePage");
+const hargaPage = $("hargaPage");
+const checkoutPage = $("checkoutPage");
+const paymentPage = $("paymentPage");
 const durationInput = $("duration");
 const music = $("backgroundMusic");
 
-let currentCategory = null;
-let selectedPackage = null;
-let currentOrder = null;
+let selected = null;
+let order = null;
 
-function rupiah(value) {
+function rupiah(number) {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0
-  }).format(Math.round(value));
+  }).format(Math.round(number));
 }
 
-function showSection(section) {
-  section.scrollIntoView({ behavior: "smooth", block: "start" });
-}
+function showPage(page) {
+  [homePage, hargaPage, checkoutPage, paymentPage].forEach(section => {
+    section.classList.add("hidden");
+  });
 
-function hideOrderSections() {
-  checkoutSection.classList.add("hidden");
-  paymentSection.classList.add("hidden");
+  page.classList.remove("hidden");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderCategories() {
-  categoryGrid.replaceChildren();
+  const grid = $("categoryGrid");
+  grid.replaceChildren();
 
-  categories.forEach((category) => {
+  categories.forEach(category => {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "category-card";
-    card.setAttribute("aria-label", "Lihat kategori " + category.name);
 
     const imageBox = document.createElement("span");
     imageBox.className = "category-image";
 
-    const image = document.createElement("img");
-    image.src = category.image;
-    image.alt = category.name;
-    image.loading = "lazy";
-    image.onerror = () => {
-      imageBox.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = category.image;
+    img.alt = category.name;
+    img.loading = "lazy";
+
+    img.onerror = () => {
+      imageBox.replaceChildren();
       const fallback = document.createElement("span");
       fallback.className = "category-hint";
       fallback.textContent = "Gambar tidak ditemukan";
       imageBox.appendChild(fallback);
     };
-    imageBox.appendChild(image);
+
+    imageBox.appendChild(img);
 
     const name = document.createElement("span");
     name.className = "category-name";
     name.textContent = category.name;
 
     const subtitle = document.createElement("span");
-    subtitle.className = "category-hint";
+    subtitle.className = "category-subtitle";
     subtitle.textContent = category.subtitle;
 
-    const description = document.createElement("span");
-    description.className = "category-hint";
-    description.textContent = category.description;
+    const desc = document.createElement("span");
+    desc.className = "category-hint";
+    desc.textContent = category.description;
 
     const arrow = document.createElement("span");
     arrow.className = "card-arrow";
     arrow.textContent = "↗";
 
-    card.append(imageBox, name, subtitle, description, arrow);
+    card.append(imageBox, name, subtitle, desc, arrow);
     card.addEventListener("click", () => openCategory(category));
-    categoryGrid.appendChild(card);
+    grid.appendChild(card);
   });
 }
 
 function openCategory(category) {
-  currentCategory = category;
-  selectedPackage = null;
-  currentOrder = null;
-  hideOrderSections();
+  selected = null;
+  order = null;
 
-  priceTitle.textContent = category.name;
-  priceDescription.textContent = category.description;
-  priceList.replaceChildren();
+  $("priceTitle").textContent = category.name;
+  $("priceDescription").textContent = category.description;
+
+  const list = $("priceList");
+  list.replaceChildren();
 
   if (category.type === "daily") {
-    const perDay = category.monthly / 30;
-
-    const options = [
-      { label: "7 Hari", days: 7 },
-      { label: "14 Hari", days: 14 },
-      { label: "30 Hari", days: 30 }
-    ];
-
-    options.forEach((option) => {
-      const total = Math.round(perDay * option.days);
-      const card = createPriceCard(
-        option.label,
-        rupiah(total),
-        rupiah(category.monthly) + " untuk 30 hari",
-        () => selectPackage({
-          category,
-          label: option.label,
-          days: option.days,
-          price: total
-        })
-      );
-      priceList.appendChild(card);
-    });
-
-    const customCard = createPriceCard(
-      "Atur Durasi Sendiri",
-      rupiah(perDay) + "/hari",
-      "Pilih jumlah hari sendiri di formulir pesanan.",
-      () => selectPackage({
+    addPriceCard(
+      "Pilih durasi sewa",
+      "Mulai 3 hari",
+      "Tarif dihitung per hari. Kamu bisa mengatur jumlah hari sendiri.",
+      () => openCheckout({
         category,
-        label: "Durasi khusus",
-        days: 7,
-        price: Math.round(perDay * 7)
+        label: "3 hari",
+        days: 3,
+        price: dailyPrice(category, 3)
       })
     );
-    priceList.appendChild(customCard);
   } else {
-    category.packages.forEach((item) => {
-      const card = createPriceCard(
+    category.packages.forEach(item => {
+      addPriceCard(
         item.label,
         rupiah(item.price),
         "Paket " + category.name,
-        () => selectPackage({
+        () => openCheckout({
           category,
           label: item.label,
           days: null,
           price: item.price
         })
       );
-      priceList.appendChild(card);
     });
   }
 
-  priceSection.classList.remove("hidden");
-  showSection(priceSection);
+  showPage(hargaPage);
 }
 
-function createPriceCard(name, price, description, onChoose) {
+function addPriceCard(title, price, description, onChoose) {
   const card = document.createElement("article");
   card.className = "price-card";
 
   const details = document.createElement("div");
-  const title = document.createElement("h3");
-  title.textContent = name;
+  const heading = document.createElement("h3");
+  heading.textContent = title;
 
   const desc = document.createElement("p");
   desc.textContent = description;
 
-  details.append(title, desc);
+  details.append(heading, desc);
 
   const actions = document.createElement("div");
-  actions.style.textAlign = "right";
-
   const amount = document.createElement("div");
   amount.className = "price-amount";
   amount.textContent = price;
@@ -233,134 +201,128 @@ function createPriceCard(name, price, description, onChoose) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "choose-button";
-  button.textContent = "PILIH PAKET";
+  button.textContent = "PILIH";
   button.addEventListener("click", onChoose);
 
   actions.append(amount, button);
   card.append(details, actions);
-  return card;
+  $("priceList").appendChild(card);
 }
 
-function selectPackage(item) {
-  selectedPackage = item;
-  currentOrder = null;
+function dailyPrice(category, days) {
+  return Math.round(category.monthly * days / 30);
+}
+
+function openCheckout(item) {
+  selected = item;
+  order = null;
 
   $("selectedProduct").textContent =
     item.category.name + " — " + item.label;
 
-  $("selectedDescription").textContent =
-    item.category.description;
+  $("selectedDescription").textContent = item.category.description;
 
-  durationGroup.classList.toggle("hidden", item.category.type !== "daily");
+  $("durationGroup").classList.toggle(
+    "hidden",
+    item.category.type !== "daily"
+  );
 
   if (item.category.type === "daily") {
-    durationInput.value = item.days || 7;
+    durationInput.value = item.days || 3;
     updateDailyPrice();
   } else {
     $("selectedPrice").textContent = rupiah(item.price);
   }
 
-  paymentSection.classList.add("hidden");
-  checkoutSection.classList.remove("hidden");
-  showSection(checkoutSection);
+  showPage(checkoutPage);
 }
 
 function updateDailyPrice() {
-  if (!selectedPackage || selectedPackage.category.type !== "daily") return;
+  if (!selected || selected.category.type !== "daily") return;
 
   let days = Number.parseInt(durationInput.value, 10);
-  if (!Number.isFinite(days)) days = 1;
+  if (!Number.isFinite(days)) days = 3;
 
   days = Math.max(1, Math.min(3650, days));
   durationInput.value = days;
 
-  const perDay = selectedPackage.category.monthly / 30;
-  selectedPackage.days = days;
-  selectedPackage.label = days + " hari";
-  selectedPackage.price = Math.round(perDay * days);
+  selected.days = days;
+  selected.label = days + " hari";
+  selected.price = dailyPrice(selected.category, days);
 
   $("selectedProduct").textContent =
-    selectedPackage.category.name + " — " + days + " hari";
+    selected.category.name + " — " + days + " hari";
 
-  $("selectedPrice").textContent = rupiah(selectedPackage.price);
+  $("selectedPrice").textContent = rupiah(selected.price);
 }
 
 $("minusDay").addEventListener("click", () => {
-  durationInput.value = Math.max(1, (Number(durationInput.value) || 1) - 1);
+  durationInput.value = Math.max(
+    1,
+    (Number(durationInput.value) || 3) - 1
+  );
   updateDailyPrice();
 });
 
 $("plusDay").addEventListener("click", () => {
-  durationInput.value = Math.min(3650, (Number(durationInput.value) || 1) + 1);
+  durationInput.value = Math.min(
+    3650,
+    (Number(durationInput.value) || 3) + 1
+  );
   updateDailyPrice();
 });
 
 durationInput.addEventListener("input", updateDailyPrice);
 durationInput.addEventListener("change", updateDailyPrice);
 
-document.querySelectorAll("[data-days]").forEach((button) => {
-  button.addEventListener("click", () => {
-    durationInput.value = button.dataset.days;
-    updateDailyPrice();
-  });
-});
+$("backCategories").addEventListener("click", () => showPage(homePage));
+$("backPrices").addEventListener("click", () => showPage(hargaPage));
+$("backCheckout").addEventListener("click", () => showPage(checkoutPage));
 
-$("backCategories").addEventListener("click", () => {
-  priceSection.classList.add("hidden");
-  hideOrderSections();
-  showSection($("kategori"));
-});
-
-$("orderForm").addEventListener("submit", (event) => {
+$("orderForm").addEventListener("submit", event => {
   event.preventDefault();
 
-  if (!selectedPackage) {
-    alert("Silakan pilih paket terlebih dahulu.");
+  if (!selected) {
+    alert("Pilih paket terlebih dahulu.");
     return;
   }
+
+  if (selected.category.type === "daily") updateDailyPrice();
 
   const name = $("customerName").value.trim();
   const phone = $("customerPhone").value.trim();
-  const note = $("customerNote").value.trim();
+  const digits = phone.replace(/\D/g, "");
 
   if (name.length < 2) {
-    alert("Masukkan nama yang benar.");
+    alert("Masukkan nama kamu.");
     return;
   }
 
-  const digits = phone.replace(/\D/g, "");
   if (digits.length < 9 || digits.length > 15) {
-    alert("Periksa kembali nomor WhatsApp kamu.");
+    alert("Periksa nomor WhatsApp kamu.");
     return;
   }
 
-  if (selectedPackage.category.type === "daily") {
-    updateDailyPrice();
-  }
-
-  currentOrder = {
+  order = {
     id: "LX-" + Date.now().toString(36).toUpperCase(),
     name,
     phone,
-    note,
-    category: selectedPackage.category.name,
-    packageName: selectedPackage.label,
-    days: selectedPackage.days,
-    price: selectedPackage.price
+    note: $("customerNote").value.trim(),
+    category: selected.category.name,
+    package: selected.label,
+    days: selected.days,
+    price: selected.price
   };
 
-  $("paymentPrice").textContent = rupiah(currentOrder.price);
-  paymentSection.classList.remove("hidden");
-  showSection(paymentSection);
+  $("paymentPrice").textContent = rupiah(order.price);
+  showPage(paymentPage);
 });
 
 $("confirmWhatsApp").addEventListener("click", () => {
-  if (!currentOrder) {
-    alert("Silakan isi formulir pesanan terlebih dahulu.");
+  if (!order) {
+    alert("Silakan buat pesanan terlebih dahulu.");
     return;
   }
-
-  const order = currentOrder;
 
   const message = [
     "Halo Min LIXERA BOT, saya ingin konfirmasi pesanan.",
@@ -369,42 +331,52 @@ $("confirmWhatsApp").addEventListener("click", () => {
     "Nama: " + order.name,
     "Nomor WhatsApp: " + order.phone,
     "Kategori: " + order.category,
-    "Paket: " + order.packageName,
+    "Paket: " + order.package,
     ...(order.days ? ["Durasi: " + order.days + " hari"] : []),
     "Total harga: " + rupiah(order.price),
     "Catatan: " + (order.note || "-"),
     "",
-    "Saya sudah melakukan pembayaran melalui QRIS. Mohon periksa pembayaran saya dan konfirmasi pesanan ini.",
-    "",
+    "Saya sudah membayar melalui QRIS. Mohon cek pembayaran dan konfirmasi pesanan saya.",
     "Terima kasih, Min."
   ].join("\n");
 
-  const url = "https://wa.me/" + ADMIN_WA + "?text=" + encodeURIComponent(message);
-  window.open(url, "_blank", "noopener,noreferrer");
+  const url = "https://wa.me/" + ADMIN_WA +
+    "?text=" + encodeURIComponent(message);
+
+  window.open(url, "_blank");
 });
 
-$("musicButton").addEventListener("click", async () => {
+// Musik: coba autoplay; browser Android mungkin tetap meminta interaksi.
+async function startMusic() {
   try {
-    if (music.paused) {
-      await music.play();
-      $("musicText").textContent = "MATIKAN MUSIK";
-      $("musicButton").classList.add("playing");
-    } else {
-      music.pause();
-      $("musicText").textContent = "PUTAR MUSIK";
-      $("musicButton").classList.remove("playing");
-    }
-  } catch (error) {
-    alert("Musik belum bisa diputar. Periksa file musicbotlixera.mp3 di GitHub.");
+    await music.play();
+    $("musicButton").textContent = "♫ MUSIK ON";
+  } catch {
+    $("musicButton").textContent = "♫ SENTUH UNTUK MUSIK";
+  }
+}
+
+$("musicButton").addEventListener("click", async () => {
+  if (music.paused) {
+    await startMusic();
+  } else {
+    music.pause();
+    $("musicButton").textContent = "♫ MUSIK OFF";
   }
 });
 
-music.addEventListener("ended", () => {
-  $("musicText").textContent = "PUTAR MUSIK";
-  $("musicButton").classList.remove("playing");
-});
+// Coba lagi setelah interaksi pertama jika autoplay diblokir.
+function firstInteraction() {
+  if (music.paused) startMusic();
+  document.removeEventListener("pointerdown", firstInteraction);
+  document.removeEventListener("keydown", firstInteraction);
+}
+
+document.addEventListener("pointerdown", firstInteraction);
+document.addEventListener("keydown", firstInteraction);
 
 $("year").textContent = new Date().getFullYear();
 
 renderCategories();
-        
+startMusic();
+                     
