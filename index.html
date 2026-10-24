@@ -3,81 +3,73 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#050914">
-  <meta name="description" content="LIXERA BOT - Sewa Bot WhatsApp, Premium, Reseller dan Owner.">
   <title>LIXERA BOT | Digital Service</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="ambient ambient-one"></div>
-  <div class="ambient ambient-two"></div>
-
   <header class="topbar">
-    <a href="#" class="brand">
-      <img src="Logol.jpg" alt="Logo LIXERA BOT">
-      <span>LIXERA<span class="blue">BOT</span><small>DIGITAL SERVICE</small></span>
+    <a href="#" class="brand" id="homeLogo">
+      <span class="logo-fallback">LS</span>
+      <img src="Logol.jpg" alt="LIXERA BOT"
+           onerror="this.style.display='none'">
+      <span class="brand-name">LIXERA<span class="blue">BOT</span><small>DIGITAL SERVICE</small></span>
     </a>
-    <button id="musicButton" class="music-button" type="button">
-      ♫ <span id="musicText">PUTAR MUSIK</span>
-    </button>
+    <button id="musicButton" class="music-button" type="button">♫ MUSIK ON</button>
   </header>
 
   <main>
-    <section class="hero">
-      <div class="hero-banner">
-        <img src="bannerbotlixera.png" alt="Banner LIXERA BOT">
+    <section id="homePage">
+      <div class="hero">
+        <div class="hero-banner">
+          <img src="bannerbotlixera.png" alt="Banner LIXERA BOT">
+        </div>
+        <div class="hero-content">
+          <span class="eyebrow">✦ DIGITAL SERVICE</span>
+          <h1>YOUR BOT.<br><span>YOUR POWER.</span></h1>
+          <p>Sewa bot WhatsApp, nikmati fitur premium, dan mulai perjalanan reseller bersama LIXERA BOT.</p>
+          <a href="#kategori" class="primary-button">JELAJAHI PRODUK ↘</a>
+        </div>
       </div>
-      <div class="hero-content">
-        <span class="eyebrow"><span class="live-dot"></span> DIGITAL SERVICE</span>
-        <h1>YOUR BOT.<br><span>YOUR POWER.</span></h1>
-        <p>Sewa bot WhatsApp, nikmati akses premium, dan mulai perjalanan reseller bersama LIXERA BOT.</p>
-        <a href="#kategori" class="primary-button">JELAJAHI PRODUK <span>↘</span></a>
-      </div>
-      <div class="hero-foot">
-        <span>01 / LIXERA BOT</span>
-        <span>SMART DIGITAL SERVICE</span>
-      </div>
+
+      <section id="kategori" class="section">
+        <span class="eyebrow">PILIH LAYANANMU</span>
+        <h2>Kategori <span class="blue">Produk</span></h2>
+        <p class="muted">Pilih kategori untuk melihat paket dan harga.</p>
+        <div id="categoryGrid" class="category-grid"></div>
+      </section>
     </section>
 
-    <section id="kategori" class="section">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">PILIH LAYANANMU</span>
-          <h2>Kategori <span class="blue">Produk</span></h2>
-        </div>
-        <span class="section-index">01 / PRODUCTS</span>
-      </div>
-      <p class="section-description">Pilih kategori untuk melihat daftar paket dan harga.</p>
-      <div id="categoryGrid" class="category-grid"></div>
-    </section>
-
-    <section id="harga" class="section hidden">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">DAFTAR PAKET</span>
-          <h2 id="priceTitle">Daftar Harga</h2>
-        </div>
-        <button id="backCategories" class="text-button" type="button">← Kategori</button>
-      </div>
-      <p id="priceDescription" class="section-description"></p>
+    <section id="hargaPage" class="section page hidden">
+      <button id="backCategories" class="back-button">← KEMBALI KE KATEGORI</button>
+      <span class="eyebrow">PILIH PAKET</span>
+      <h2 id="priceTitle">Daftar Harga</h2>
+      <p id="priceDescription" class="muted"></p>
       <div id="priceList" class="price-list"></div>
     </section>
 
-    <section id="checkout" class="section hidden">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">ORDER SERVICE</span>
-          <h2>Formulir <span class="blue">Pesanan</span></h2>
-        </div>
-        <span class="section-index">02 / ORDER</span>
-      </div>
+    <section id="checkoutPage" class="section page hidden">
+      <button id="backPrices" class="back-button">← KEMBALI KE PAKET</button>
+      <span class="eyebrow">DETAIL PESANAN</span>
+      <h2>Formulir <span class="blue">Order</span></h2>
 
       <div class="order-summary">
-        <span class="summary-label">PAKET PILIHAN</span>
+        <p class="muted">PAKET PILIHAN</p>
         <h3 id="selectedProduct">-</h3>
-        <p id="selectedDescription">-</p>
-        <div class="summary-total">
+        <p id="selectedDescription" class="muted"></p>
+
+        <div id="durationGroup" class="form-group hidden">
+          <label>Atur durasi sewa (hari)</label>
+          <div class="duration-control">
+            <button id="minusDay" type="button" aria-label="Kurangi hari">−</button>
+            <input id="duration" type="number" min="1" max="3650" value="3" inputmode="numeric">
+            <button id="plusDay" type="button" aria-label="Tambah hari">+</button>
+          </div>
+          <p class="muted small">Tekan + atau − untuk mengubah hari dan harga.</p>
+        </div>
+
+        <div class="total-row">
           <span>Total harga</span>
           <strong id="selectedPrice">Rp0</strong>
         </div>
@@ -86,89 +78,52 @@
       <form id="orderForm">
         <div class="form-group">
           <label for="customerName">Nama pelanggan</label>
-          <input id="customerName" name="customerName" type="text"
-            placeholder="Masukkan nama kamu" maxlength="60" required>
+          <input id="customerName" required maxlength="60" placeholder="Nama kamu">
         </div>
-
         <div class="form-group">
           <label for="customerPhone">Nomor WhatsApp</label>
-          <input id="customerPhone" name="customerPhone" type="tel"
-            inputmode="tel" placeholder="Contoh: 081234567890"
-            maxlength="20" required>
+          <input id="customerPhone" type="tel" inputmode="tel" required maxlength="20" placeholder="08xxxxxxxxxx">
         </div>
-
-        <div id="durationGroup" class="form-group hidden">
-          <label for="duration">Durasi sewa (hari)</label>
-          <div class="duration-control">
-            <button type="button" id="minusDay" aria-label="Kurangi hari">−</button>
-            <input id="duration" type="number" min="1" max="3650"
-              value="7" inputmode="numeric">
-            <button type="button" id="plusDay" aria-label="Tambah hari">+</button>
-          </div>
-          <div class="quick-days">
-            <button type="button" data-days="7">7 hari</button>
-            <button type="button" data-days="14">14 hari</button>
-            <button type="button" data-days="30">30 hari</button>
-          </div>
-          <p class="field-hint">Tarif harian dihitung dari harga bulanan dibagi 30 hari.</p>
-        </div>
-
         <div class="form-group">
           <label for="customerNote">Catatan (opsional)</label>
-          <textarea id="customerNote" name="customerNote" rows="3"
-            maxlength="500" placeholder="Catatan tambahan jika ada"></textarea>
+          <textarea id="customerNote" rows="3" maxlength="500" placeholder="Catatan tambahan"></textarea>
         </div>
-
-        <button type="submit" class="primary-button full-button">
-          ORDER SEKARANG <span>↗</span>
-        </button>
-        <p class="field-hint">QR pembayaran muncul setelah tombol order ditekan.</p>
+        <button type="submit" class="primary-button full">ORDER SEKARANG ↗</button>
       </form>
     </section>
 
-    <section id="payment" class="section hidden">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">PAYMENT</span>
-          <h2>Pembayaran <span class="blue">QRIS</span></h2>
-        </div>
-        <span class="payment-label">PEMBAYARAN MANUAL</span>
-      </div>
-
+    <section id="paymentPage" class="section page hidden">
+      <button id="backCheckout" class="back-button">← KEMBALI KE PESANAN</button>
+      <span class="eyebrow">PAYMENT</span>
+      <h2>Pembayaran <span class="blue">QRIS</span></h2>
       <div class="payment-card">
-        <p>Pindai QRIS di bawah ini menggunakan aplikasi pembayaran kamu.</p>
+        <p class="muted">Pindai QRIS dan bayar sesuai nominal berikut.</p>
         <div class="qr-frame">
           <img src="qrislixera.jpg" alt="QRIS LIXERA BOT">
         </div>
-        <div class="payment-total">
-          <span>Total yang harus dibayar</span>
-          <strong id="paymentPrice">Rp0</strong>
-        </div>
-        <p class="field-hint">Periksa nominal sebelum membayar. Admin akan memverifikasi pembayaran secara manual.</p>
-        <button id="confirmWhatsApp" class="whatsapp-button" type="button">
-          <span>☏</span> SUDAH BAYAR — KONFIRMASI WA
+        <p class="muted">Total pembayaran</p>
+        <h2 id="paymentPrice" class="blue">Rp0</h2>
+        <p class="muted small">Pembayaran diperiksa secara manual oleh admin.</p>
+        <button id="confirmWhatsApp" type="button" class="whatsapp-button">
+          SUDAH BAYAR — KONFIRMASI WHATSAPP
         </button>
-        <p class="field-hint center">WhatsApp akan terbuka dengan detail pesanan yang sudah terisi.</p>
       </div>
     </section>
 
     <section class="trust-strip">
-      <div><span>01</span><strong>Pilih paket</strong><small>Tentukan layanan</small></div>
-      <div><span>02</span><strong>Bayar QRIS</strong><small>Ikuti nominal</small></div>
-      <div><span>03</span><strong>Konfirmasi</strong><small>Hubungi admin</small></div>
+      <div><strong>01</strong><span>Pilih paket</span></div>
+      <div><strong>02</strong><span>Bayar QRIS</span></div>
+      <div><strong>03</strong><span>Konfirmasi admin</span></div>
     </section>
   </main>
 
   <footer class="footer">
-    <a href="#" class="footer-brand">
-      <img src="Logol.jpg" alt="Logo"> LIXERA<span class="blue">BOT</span>
-    </a>
+    <div class="footer-brand">LIXERA<span class="blue">BOT</span></div>
     <p>Digital service for your next level.</p>
-    <small>© <span id="year"></span> LIXERA BOT. All rights reserved.</small>
+    <small>© <span id="year"></span> LIXERA BOT</small>
   </footer>
 
-  <audio id="backgroundMusic" src="musicbotlixera.mp3" loop preload="none"></audio>
+  <audio id="backgroundMusic" src="musicbotlixera.mp3" loop preload="auto"></audio>
   <script src="script.js"></script>
 </body>
-      </html>
-
+</html>
